@@ -266,7 +266,7 @@ impl Client {
             .await
     }
 
-    /// Executes a statement, returning a vector of the resulting rows in Text Format.
+    /// Executes a statement, returning a vector of the resulting rows in the specified Format.
     ///
     /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
     /// provided, 1-indexed.
@@ -274,15 +274,16 @@ impl Client {
     /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
     /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
     /// with the `prepare` method.
-    pub async fn query_with_text_format<T>(
+    pub async fn query_with_format<T>(
         &self,
         statement: &T,
         params: &[&(dyn ToSql + Sync)],
+        result_format: FormatCode,
     ) -> Result<Vec<Row>, Error>
     where
         T: ?Sized + ToStatement,
     {
-        self.query_raw(statement, slice_iter(params), FormatCode::Text)
+        self.query_raw(statement, slice_iter(params), result_format)
             .await?
             .try_collect()
             .await
