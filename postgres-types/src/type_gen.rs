@@ -13,6 +13,7 @@ pub struct Other {
 
 #[derive(PartialEq, Eq, Clone, Debug, Hash)]
 pub enum Inner {
+    Unspecified,
     Bool,
     Bytea,
     Char,
@@ -204,6 +205,7 @@ pub enum Inner {
 impl Inner {
     pub fn from_oid(oid: Oid) -> Option<Inner> {
         match oid {
+            0 => Some(Inner::Unspecified),
             16 => Some(Inner::Bool),
             17 => Some(Inner::Bytea),
             18 => Some(Inner::Char),
@@ -395,6 +397,7 @@ impl Inner {
 
     pub fn oid(&self) -> Oid {
         match *self {
+            Inner::Unspecified => 0,
             Inner::Bool => 16,
             Inner::Bytea => 17,
             Inner::Char => 18,
@@ -586,6 +589,7 @@ impl Inner {
 
     pub fn kind(&self) -> &Kind {
         match *self {
+            Inner::Unspecified => &Kind::Simple,
             Inner::Bool => &Kind::Simple,
             Inner::Bytea => &Kind::Simple,
             Inner::Char => &Kind::Simple,
@@ -777,6 +781,7 @@ impl Inner {
 
     pub fn name(&self) -> &str {
         match *self {
+            Inner::Unspecified => "unspecified",
             Inner::Bool => "bool",
             Inner::Bytea => "bytea",
             Inner::Char => "char",
@@ -967,6 +972,9 @@ impl Inner {
     }
 }
 impl Type {
+    /// Unspecified
+    pub const UNSPECIFIED: Type = Type(Inner::Unspecified);
+
     /// BOOL - boolean, &#39;true&#39;/&#39;false&#39;
     pub const BOOL: Type = Type(Inner::Bool);
 
