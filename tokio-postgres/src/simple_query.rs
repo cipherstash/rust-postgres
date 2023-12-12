@@ -88,11 +88,16 @@ impl Stream for SimpleQueryStream {
         loop {
             match ready!(this.responses.poll_next(cx)?) {
                 Message::CommandComplete(body) => {
+                    let tag = body.tag().map_err(Error::parse)?.to_string();
                     let rows = extract_row_affected(&body)?;
-                    return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete(rows))));
+                    return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete {
+                        tag,
+                        rows,
+                    })));
                 }
                 Message::EmptyQueryResponse => {
-                    return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete(0))));
+                    // return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete{ tag: "empty".into(), rows: 0 })));
+                    return Poll::Ready(None);
                 }
                 Message::RowDescription(body) => {
                     let columns = body

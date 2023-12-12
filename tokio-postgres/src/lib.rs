@@ -246,8 +246,8 @@ pub enum SimpleQueryMessage {
     Row(SimpleQueryRow),
     /// A statement in the query has completed.
     ///
-    /// The number of rows modified or selected is returned.
-    CommandComplete(u64),
+    /// The command tag and number of rows modified or selected is returned.
+    CommandComplete { tag: String, rows: u64 },
 }
 
 fn slice_iter<'a>(

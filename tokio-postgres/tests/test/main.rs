@@ -318,12 +318,12 @@ async fn simple_query() {
         .await
         .unwrap();
 
-    match messages[0] {
-        SimpleQueryMessage::CommandComplete(0) => {}
+    match &messages[0] {
+        SimpleQueryMessage::CommandComplete { tag, rows: 0 } => {}
         _ => panic!("unexpected message"),
     }
-    match messages[1] {
-        SimpleQueryMessage::CommandComplete(2) => {}
+    match &messages[1] {
+        SimpleQueryMessage::CommandComplete { tag, rows: 2 } => {}
         _ => panic!("unexpected message"),
     }
     match &messages[2] {
@@ -344,8 +344,8 @@ async fn simple_query() {
         }
         _ => panic!("unexpected message"),
     }
-    match messages[4] {
-        SimpleQueryMessage::CommandComplete(2) => {}
+    match &messages[4] {
+        SimpleQueryMessage::CommandComplete { tag, rows: 2 } => {}
         _ => panic!("unexpected message"),
     }
     assert_eq!(messages.len(), 5);
