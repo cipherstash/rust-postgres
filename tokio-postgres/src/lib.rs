@@ -263,6 +263,11 @@ impl CommandTag {
     pub fn rows(&self) -> u64 {
         self.0.rsplit(' ').next().unwrap().parse().unwrap_or(0)
     }
+
+    /// The tag
+    pub fn tag(&self) -> String {
+        self.0.to_string()
+    }
 }
 
 fn slice_iter<'a>(
