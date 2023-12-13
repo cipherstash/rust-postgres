@@ -1,8 +1,7 @@
 use crate::client::{InnerClient, Responses};
 use crate::codec::FrontendMessage;
 use crate::connection::RequestMessages;
-use crate::query::extract_row_affected;
-use crate::{Error, SimpleQueryMessage, SimpleQueryRow};
+use crate::{CommandTag, Error, SimpleQueryMessage, SimpleQueryRow};
 use bytes::Bytes;
 use fallible_iterator::FallibleIterator;
 use futures_util::{ready, Stream};
@@ -88,15 +87,10 @@ impl Stream for SimpleQueryStream {
         loop {
             match ready!(this.responses.poll_next(cx)?) {
                 Message::CommandComplete(body) => {
-                    let tag = body.tag().map_err(Error::parse)?.to_string();
-                    let rows = extract_row_affected(&body)?;
-                    return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete {
-                        tag,
-                        rows,
-                    })));
+                    let tag = CommandTag::new(body.tag().map_err(Error::parse)?);
+                    return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete(tag))));
                 }
                 Message::EmptyQueryResponse => {
-                    // return Poll::Ready(Some(Ok(SimpleQueryMessage::CommandComplete{ tag: "empty".into(), rows: 0 })));
                     return Poll::Ready(None);
                 }
                 Message::RowDescription(body) => {

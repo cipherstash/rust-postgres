@@ -247,7 +247,22 @@ pub enum SimpleQueryMessage {
     /// A statement in the query has completed.
     ///
     /// The command tag and number of rows modified or selected is returned.
-    CommandComplete { tag: String, rows: u64 },
+    CommandComplete(CommandTag),
+}
+
+/// Command Tag returned by the `SimpleQuery` stream.
+#[derive(Debug)]
+pub struct CommandTag(String);
+
+impl CommandTag {
+    pub(crate) fn new(tag: impl ToString) -> Self {
+        Self(tag.to_string())
+    }
+
+    /// The number of affected rows
+    pub fn rows(&self) -> u64 {
+        self.0.rsplit(' ').next().unwrap().parse().unwrap_or(0)
+    }
 }
 
 fn slice_iter<'a>(
