@@ -261,7 +261,10 @@ impl CommandTag {
 
     /// The number of affected rows
     pub fn rows(&self) -> u64 {
-        self.0.rsplit(' ').next().unwrap().parse().unwrap_or(0)
+        self.0
+            .rsplit(' ')
+            .next()
+            .map_or(0, |w| w.parse().unwrap_or(0))
     }
 
     /// The tag
